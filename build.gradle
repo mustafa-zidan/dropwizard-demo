@@ -1,0 +1,54 @@
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id 'java'
+    id 'idea'
+    id 'application'
+}
+
+group 'me.zidan'
+version '1.0-SNAPSHOT'
+description 'Sample Dropwizard REST Stub'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'ru.vyarus', name: 'dropwizard-guicey', version: '4.2.2'
+    compile group: 'io.dropwizard', name: 'dropwizard-core', version: '1.3.16'
+    compile group: 'io.dropwizard', name: 'dropwizard-auth', version: '0.7.1'
+    compile group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.2.2'
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+    compile group: 'org.projectlombok', name: 'lombok-maven', version: '1.18.10.0', ext: 'pom'
+
+    testCompile group: 'io.dropwizard', name: 'dropwizard-testing', version: '1.3.16'
+}
+
+mainClassName = 'me.zidan.dropwizard.DemoApplication'
+
+shadowJar {
+    mergeServiceFiles()
+    exclude 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.SF'
+    manifest {
+        attributes 'Implementation-Title': rootProject.name
+        attributes 'Implementation-Version': rootProject.version
+        attributes 'Implementation-Vendor-Id': rootProject.group
+        attributes 'Build-Time': ZonedDateTime.now(ZoneId.of("UTC"))
+                .format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+        attributes 'Built-By': InetAddress.localHost.hostName
+        attributes 'Created-By': 'Gradle ' + gradle.gradleVersion
+        attributes 'Main-Class': mainClassName
+    }
+    archiveName 'dropwizard-demo.jar'
+}
+
+run {
+    args = ['server', 'config.yml']
+}
